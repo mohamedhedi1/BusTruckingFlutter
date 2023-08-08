@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../services/api_service.dart';
-import '../models/Station.dart'; //
-
+import '../models/Station.dart';
+import '../services/location_service.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -12,29 +14,39 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   LatLng busPosition = LatLng(35.83168535761309, 10.233006581002806);
-  LatLng myPosition = LatLng(36, 10);
+  late LatLng myPosition ;
   List<Station> stationList = [];
 
   @override
   void initState() {
     super.initState();
-
-
-   ApiService.getListStationByCircuitId(1).then((list) {
+    LocationService.getMyPosition().then((myPositionResult) {
+      setState(() {
+        myPosition = myPositionResult;
+      });
+    });
+    ApiService.getListStationByCircuitId(1).then((list) {
       setState(() {
         stationList = list as List<Station>;
       });
     });
+
+    startUpdatingMarkerPosition();
   }
 
-
-
-
-
-
+  void startUpdatingMarkerPosition() {
+    Timer.periodic(Duration(seconds: 1), (timer) async {
+      Map<String, double> positionData = await ApiService.getPositionById(1);
+      setState(() {
+        busPosition = LatLng(positionData['lat']!, positionData['long']!);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -43,7 +55,7 @@ class _MapScreenState extends State<MapScreen> {
       body: FlutterMap(
         options: MapOptions(
           center: busPosition,
-          zoom: 8.0,
+          zoom: 10.0,
         ),
         children: [
           TileLayer(
