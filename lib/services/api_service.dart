@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/Bus.dart';
 import '../models/Station.dart';
 
 class ApiService {
@@ -48,4 +49,18 @@ class ApiService {
     double long = data['long'];
     return {'lat': lat, 'long': long};
   }
+
+  static Future<Bus> getBusbyUserId(id) async
+  {
+    var baseurl = "http://10.0.2.2:8080/User/busbyiduser/$id";
+    var response = await http.get(Uri.parse(baseurl));
+    final data = jsonDecode(response.body);
+    print("bussssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+    print(data);
+    return data;
+
+  }
+
+
+
 }

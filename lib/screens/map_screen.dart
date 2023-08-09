@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../models/Bus.dart';
 import '../services/api_service.dart';
 import '../models/Station.dart';
 import '../services/location_service.dart';
+
 
 class MapScreen extends StatefulWidget {
   @override
@@ -14,8 +16,10 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   LatLng busPosition = LatLng(35.83168535761309, 10.233006581002806);
-  late LatLng myPosition ;
+  LatLng myPosition =LatLng(0,0);
   List<Station> stationList = [];
+  late Bus bus;
+
 
   @override
   void initState() {
@@ -32,6 +36,14 @@ class _MapScreenState extends State<MapScreen> {
     });
 
     startUpdatingMarkerPosition();
+
+    //tester bus by userid
+    ApiService.getBusbyUserId(1).then((data){
+      setState(() {
+        bus = data;
+      });
+    });
+
   }
 
   void startUpdatingMarkerPosition() {
@@ -43,10 +55,9 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
