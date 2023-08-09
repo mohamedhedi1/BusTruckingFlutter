@@ -19,6 +19,7 @@ class _MapScreenState extends State<MapScreen> {
   LatLng myPosition =LatLng(0,0);
   List<Station> stationList = [];
   late Bus bus;
+ /* int circuitId =1 ;     */
 
 
   @override
@@ -35,12 +36,14 @@ class _MapScreenState extends State<MapScreen> {
       });
     });
 
-    startUpdatingMarkerPosition();
+   // startUpdatingMarkerPosition();
 
     //tester bus by userid
     ApiService.getBusbyUserId(1).then((data){
       setState(() {
         bus = data;
+       // circuitId = data.circuit.id;
+
       });
     });
 
@@ -66,7 +69,7 @@ class _MapScreenState extends State<MapScreen> {
       body: FlutterMap(
         options: MapOptions(
           center: busPosition,
-          zoom: 10.0,
+          zoom: 5.0,
         ),
         children: [
           TileLayer(

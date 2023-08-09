@@ -50,16 +50,25 @@ class ApiService {
     return {'lat': lat, 'long': long};
   }
 
-  static Future<Bus> getBusbyUserId(id) async
-  {
+  static Future<Bus> getBusbyUserId(id) async {
     var baseurl = "http://10.0.2.2:8080/User/busbyiduser/$id";
     var response = await http.get(Uri.parse(baseurl));
-    final data = jsonDecode(response.body);
-    print("bussssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
-    print(data);
-    return data;
 
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("bussssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+      print(data);
+
+      Bus bus = Bus.fromJson(data); // Assuming you have a fromJson constructor in your Bus class
+      return bus;
+    } else {
+      print("Erreur de requête - Statut ${response.statusCode}");
+      throw Exception("Erreur de requête");
+    }
   }
+
+
+
 
 
 

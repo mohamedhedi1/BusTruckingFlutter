@@ -1,10 +1,8 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import '../../../home_mg.dart';
-import '../../../home_page.dart';
 import 'package:login_screen/utils/constants.dart';
 
 
@@ -259,3 +257,4 @@ class AuthService {
     }
   }
 }
+*/
