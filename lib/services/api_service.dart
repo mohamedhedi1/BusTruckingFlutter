@@ -1,10 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/Bus.dart';
 import '../models/Station.dart';
 
 class ApiService {
   static Future<List<Station>> getListStationByCircuitId(int id) async {
-    var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
+    var baseUrl = "http://10.0.2.2:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl));
 
@@ -39,7 +40,7 @@ class ApiService {
   }
 
   static Future<Map<String, double>> getPositionById(id) async {
-    var baseurl = "http://localhost:8080/Bus/getPositionById/$id";
+    var baseurl = "http://10.0.2.2:8080/Bus/getPositionById/$id";
     var response = await http.get(Uri.parse(baseurl));
     final data = jsonDecode(response.body);
     print("hello bus position");
@@ -48,4 +49,27 @@ class ApiService {
     double long = data['long'];
     return {'lat': lat, 'long': long};
   }
+
+  static Future<Bus> getBusbyUserId(id) async {
+   var baseurl = "http://10.0.2.2:8080/User/busbyiduser/$id";
+    var response = await http.get(Uri.parse(baseurl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("bussssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+      print(data);
+
+      Bus bus = Bus.fromJson(data); // Assuming you have a fromJson constructor in your Bus class
+      return bus;
+    } else {
+      print("Erreur de requête - Statut ${response.statusCode}");
+      throw Exception("Erreur de requête");
+    }
+  }
+
+
+
+
+
+
 }

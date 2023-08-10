@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../models/Bus.dart';
 import '../services/api_service.dart';
 import '../models/Station.dart';
 import '../services/location_service.dart';
 import '../screens/userscreen.dart';
+
 
 
 class MapScreen extends StatefulWidget {
@@ -26,6 +28,7 @@ class _MapScreenState extends State<MapScreen> {
   List<LatLng> busPath = [];
   bool initialPositionReceived = false; 
   LatLng previousBusPosition = LatLng(0, 0); // List to store bus path points
+  late Bus bus;
 
 
   @override
@@ -49,7 +52,17 @@ class _MapScreenState extends State<MapScreen> {
       });
     }
 
-    startUpdatingMarkerPosition();
+   // startUpdatingMarkerPosition();
+
+    //tester bus by userid
+    ApiService.getBusbyUserId(1).then((data){
+      setState(() {
+        bus = data;
+       // circuitId = data.circuit.id;
+
+      });
+    });
+
   }
 
   void startUpdatingMarkerPosition() {
