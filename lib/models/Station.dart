@@ -1,3 +1,8 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 class Station {
   int id;
   String station;
@@ -5,6 +10,10 @@ class Station {
   double latitudePosition;
   CircuitDetails circuit;
 
+ bool isBusAtStation = false;
+  bool isBusPassedBy = false;
+  IconData icon = Icons.location_on;
+  
   Station({
     required this.id,
     required this.station,
