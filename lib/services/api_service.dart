@@ -2,10 +2,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/Bus.dart';
 import '../models/Station.dart';
+import '../models/User.dart';
+
 
 class ApiService {
   static Future<List<Station>> getListStationByCircuitId(int id) async {
-    var baseUrl = "http://10.0.2.2:8080/Circuit/StationsbyCircuitId/$id";
+    var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl));
 
@@ -40,7 +42,7 @@ class ApiService {
   }
 
   static Future<Map<String, double>> getPositionById(id) async {
-    var baseurl = "http://10.0.2.2:8080/Bus/getPositionById/$id";
+    var baseurl = "http://localhost:8080/Bus/getPositionById/$id";
     var response = await http.get(Uri.parse(baseurl));
     final data = jsonDecode(response.body);
     print("hello bus position");
@@ -51,7 +53,7 @@ class ApiService {
   }
 
   static Future<Bus> getBusbyUserId(id) async {
-   var baseurl = "http://10.0.2.2:8080/User/busbyiduser/$id";
+   var baseurl = "http://localhost:8080/User/busbyiduser/$id";
     var response = await http.get(Uri.parse(baseurl));
 
     if (response.statusCode == 200) {
@@ -67,9 +69,22 @@ class ApiService {
     }
   }
 
+ static Future<User> getUserByUser(userCode) async {
+   var baseurl = "http://localhost:8080/User/Code/$userCode";
+    var response = await http.get(Uri.parse(baseurl));
 
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("USEEEEEEEEEEEEEER");
+      print(data);
 
-
-
+      User user = User.fromJson(data); // Assuming you have a fromJson constructor in your User class
+      return user;
+    } else {
+      print("Erreur de requête - Statut ${response.statusCode}");
+      throw Exception("Erreur de requête");
+    }
+  }
+  
 
 }

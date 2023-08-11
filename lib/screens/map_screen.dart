@@ -8,6 +8,9 @@ import '../services/api_service.dart';
 import '../models/Station.dart';
 import '../services/location_service.dart';
 import '../screens/userscreen.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 
 
@@ -29,6 +32,10 @@ class _MapScreenState extends State<MapScreen> {
   bool initialPositionReceived = false; 
   LatLng previousBusPosition = LatLng(0, 0); // List to store bus path points
   late Bus bus;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =FlutterLocalNotificationsPlugin();
+final Geolocator geolocator = Geolocator();
+  
+  
 
 
   @override
@@ -71,8 +78,7 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         busPosition = LatLng(positionData['lat']!, positionData['long']!);
       });
-      /*checkIfBusAtStation();
-      checkIfBusPassesByStation();*/
+    
       setState(() {});
       
     setState(() {
@@ -85,27 +91,7 @@ class _MapScreenState extends State<MapScreen> {
       });
     });
   }
-/*void checkIfBusAtStation() {
-    for (var station in stationList) {
-      station.isBusAtStation = busPosition == LatLng(station.latitudePosition, station.longitudePosition);
-    }
-  }
 
-  void checkIfBusPassesByStation() {
-    for (var station in stationList) {
-      if (!station.isBusPassedBy &&
-          ((previousBusPosition.latitude < station.latitudePosition &&
-                  busPosition.latitude >= station.latitudePosition) ||
-              (previousBusPosition.latitude >= station.latitudePosition &&
-                  busPosition.latitude < station.latitudePosition))) {
-        setState(() {
-          station.isBusPassedBy = true;
-          station.icon = Icons.location_off;
-        });
-      }
-    }
-    previousBusPosition = busPosition;
-  }*/
 TileLayer _getTileLayerOptions() {
     final tileUrl = isNightTime ? nightTileUrl : dayTileUrl;
 
@@ -121,19 +107,43 @@ TileLayer _getTileLayerOptions() {
   }
  void _goToBusPosition() {
     if (busPosition != null) {
-      mapController.move(busPosition, 15.0);
+      mapController.move(busPosition, 25.0);
     }
   }
 @override
 Widget build(BuildContext context) {
-  return Scaffold(
-    body: Stack(
-      children: [
+  return MaterialApp(
+    title: 'Moving Marker ',
+      home: Scaffold(
+          appBar: AppBar(
+    title: Text(
+      'Track order',
+      style: TextStyle(
+         fontFamily: 'MontserratAlternates', 
+    fontWeight: FontWeight.normal,
+    fontSize: 17,
+        color: Colors.black, 
+      ),
+    ),
+    centerTitle: true,
+    backgroundColor: Color.fromARGB(255, 254, 254, 254),
+    elevation: 0,
+  ),
+   body: Container(
+  decoration: BoxDecoration(
+    /*color: Color.fromARGB(223, 204, 221, 15),// Set the background color here
+    border: Border.all(color: const Color.fromARGB(255, 192, 7, 7).withOpacity(0.3)),*/
+    borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
+  ),
+    child: ClipRRect(
+    borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
+      child: Stack(
+        children: [
         FlutterMap(
           mapController: mapController,
           options: MapOptions(
             center: busPosition,
-            zoom: 1.0,
+            zoom:10.0,
           ),
           children: [
             TileLayer(
@@ -170,7 +180,7 @@ Widget build(BuildContext context) {
           polylines: [
             Polyline(
               points: busPath,
-              color: Colors.blue,
+              color: Color.fromARGB(255, 182, 15, 32),
               strokeWidth: 4.0,
             ),
           ],
@@ -186,6 +196,35 @@ Widget build(BuildContext context) {
           },
         ),
         Positioned(
+  top: 32.0, // Adjust this value to move the compass icon down
+  right: 16.0,
+  child: GestureDetector(
+    onTap: () {
+      mapController.rotate(0.0); // Reset the map rotation
+    },
+    child: Container(
+      padding: EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Icon(
+        Icons.explore,
+        color: Colors.black,
+        size: 24.0,
+      ),
+    ),
+  ),
+),
+        Positioned(
             bottom: 16.0,
             right: 16.0,
             child: FloatingActionButton(
@@ -196,18 +235,21 @@ Widget build(BuildContext context) {
             ),
           ),
           
- Positioned(
+        Positioned(
           bottom: 80.0,
           right: 16.0,
           child: FloatingActionButton(
-            onPressed: _goToBusPosition, // Replace with appropriate function
-            child: Icon(Icons.directions_bus), // Use the bus icon
-            backgroundColor: Colors.green, // Customize the color as needed
+            onPressed: _goToBusPosition, 
+            child: Icon(Icons.directions_bus),
+            backgroundColor: Color.fromARGB(255, 7, 38, 163), 
             tooltip: 'Go to Bus Position',
           ),
             ),
         ],
       ),
-    );
+    ),
+      ),
+  ),
+  );
   }
 }
