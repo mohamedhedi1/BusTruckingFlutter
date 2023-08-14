@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/Bus.dart';
@@ -8,10 +10,11 @@ import 'package:geocoding/geocoding.dart';
 
 
 
+import '../screens/map_screen.dart';
 
 class ApiService {
   static Future<List<Station>> getListStationByCircuitId(int id) async {
-    var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
+    var baseUrl = "http://10.0.2.2:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl));
 
@@ -46,7 +49,7 @@ class ApiService {
   }
 
   static Future<Map<String, double>> getPositionById(id) async {
-    var baseurl = "http://localhost:8080/Bus/getPositionById/$id";
+    var baseurl = "http://10.0.2.2:8080/Bus/getPositionById/$id";
     var response = await http.get(Uri.parse(baseurl));
     final data = jsonDecode(response.body);
     print("hello bus positionnnnnnnnnnnnnnnnnnnnnnnn");
@@ -60,15 +63,14 @@ class ApiService {
   
 
   static Future<Bus> getBusbyUserId(id) async {
-   var baseurl = "http://localhost:8080/User/busbyiduser/$id";
+    var baseurl = "http://10.0.2.2:8080/User/busbyiduser/$id";
     var response = await http.get(Uri.parse(baseurl));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print("bussssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
       print(data);
 
-      Bus bus = Bus.fromJson(data); // Assuming you have a fromJson constructor in your Bus class
+      Bus bus = Bus.fromJson(data);
       return bus;
     } else {
       print("Erreur de requête - Statut ${response.statusCode}");
@@ -76,22 +78,86 @@ class ApiService {
     }
   }
 
- static Future<User> getUserByUser(userCode) async {
-   var baseurl = "http://localhost:8080/User/Code/$userCode";
-    var response = await http.get(Uri.parse(baseurl));
+  static Future<User> userByCode(String matricule, String accessToken) async {
+    var baseUrl = "http://10.0.2.2:8080/User/Code/$matricule";
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print("USEEEEEEEEEEEEEER");
-      print(data);
+    try {
+      final response = await http.get(
+        Uri.parse(baseUrl),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("User data:");
+        print(data);
+        User user = User.fromJson(data);
+        return user;
 
-      User user = User.fromJson(data); // Assuming you have a fromJson constructor in your User class
-      return user;
-    } else {
-      print("Erreur de requête - Statut ${response.statusCode}");
-      throw Exception("Erreur de requête");
+      } else {
+        print("Erreur de requête - Statut ${response.statusCode}");
+        throw Exception("Erreur de requête");
+      }
+    } catch (e) {
+      print('Error $e');
+      throw Exception("Erreur inattendue");
     }
   }
+
+
+  static  Future<bool> login(BuildContext context, String matricule, String mdp) async {
+    var  loginUrl = "http://10.0.2.2:8080/authenticate/login";
+    try {
+      final response = await http.post(
+        Uri.parse(loginUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "userCode" : matricule ,
+          "password" : mdp
+        }),
+      );
+      if (response.statusCode >= 200) {
+        final data = json.decode(response.body);
+        final User user = await userByCode(matricule, data['access_token']);
+
+        print("User role:");
+        print(user.role);
+
+        print("tokeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeen");
+        print( data['access_token'] );
+
+
+        if (user.role== 'USER') {
+          print("777777777777777777777777777777777777777777777777777777777777777777777777");
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => MapScreen(),
+            ),
+          );
+          return true;
+        }
+          print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        return true;
+
+
+      }else {
+        print("hellooooooooooooooooooooooooooooooooooooooooooooo");
+        print(response.statusCode);
+        return false;
+      }
+    } catch (e) {
+      // Error occurred during login
+      print('Error during login: $e');
+      return false;
+    }
+  }
+
+
+
 
    static  Future<List<LatLng>> getRoutePoints() async {
     //   static  Future<List<LatLng>> getRoutePoints(List pointValues) async {

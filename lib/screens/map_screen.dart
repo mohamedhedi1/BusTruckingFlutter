@@ -105,8 +105,7 @@ class _MapScreenState extends State<MapScreen> {
 
       });
     });
-    id=bus.id;
-      Map<String, double> positionData = await ApiService.getPositionById(id);
+      Map<String, double> positionData = await ApiService.getPositionById(bus.id);
       setState(() {
         busPosition = LatLng(positionData['lat']!, positionData['long']!);
       });
