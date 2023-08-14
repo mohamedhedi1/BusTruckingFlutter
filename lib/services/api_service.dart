@@ -14,7 +14,7 @@ import '../screens/map_screen.dart';
 
 class ApiService {
   static Future<List<Station>> getListStationByCircuitId(int id) async {
-    var baseUrl = "http://10.0.2.2:8080/Circuit/StationsbyCircuitId/$id";
+    var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl));
 
@@ -164,31 +164,31 @@ class ApiService {
 
  /*   List<String> formattedPairs = [];
     for (int i = 0; i < pointValues.length; i += 2) {
-    double lat = pointValues[i];
+   
     double lon = pointValues[i + 1];
+    double lat = pointValues[i];
     formattedPairs.add('$lat,$lon');
 }
 String point = formattedPairs.join(';');
     var baseurl="http://router.project-osrm.org/route/v1/driving/$point?steps=true&annotations=true&geometries=geojson&overview=full";*/
                    
-                     List<Location> start_l = await locationFromAddress(
-                      "Boulangerie Pâtisserie Ranim, Avenue Habib Bougatfa, El Bassatine, Le Bardo, Tunis, Gouvernorat Tunis, 2000, Tunisie"
-);
-                      List<Location> end_l = await locationFromAddress("Rue du Lac Biwa, Difaf al Boukhaïra, El Bouhaira, Délégation Cité El Khadra, Tunis, Gouvernorat Tunis, 1055, Tunisie");
-                                      
-                      var v1 = start_l[0].latitude;
-                      var v2 = start_l[0].longitude;
-                      var v3 = end_l[0].latitude;
-                      var v4 = end_l[0].longitude;
-                      
-                      var baseurl = 'http://router.project-osrm.org/route/v1/driving/$v2,$v1;$v4,$v3?steps=true&annotations=true&geometries=geojson&overview=full';
+                     
+                      var v1 =  10.21822793177027;
+                      var v2 = 36.84843549171408;
+                      var v3 = 10.203546537447805;
+                      var v4 = 36.82752985055981;
+                      print("v1=$v1");
+                      print("v2=$v2");
+                      print("v3=$v3");
+                      print("v4=$v4");
+                      var baseurl = 'http://router.project-osrm.org/route/v1/driving/$v1,$v2;$v3,$v4?steps=true&annotations=true&geometries=geojson&overview=full';
   
     var response = await http.get(Uri.parse(baseurl));
     
     if (response.statusCode == 200) {
       final routeData = jsonDecode(response.body)['routes'][0]['geometry']['coordinates'];
       print('iam heeeeeeeeeeeeeeeeeeeeeeeeeere');
-      print(routeData);
+      print("0routadataaaaaaaaaaaaaaaaaaa$routeData");
       
 
       List<LatLng> routePoints = [];

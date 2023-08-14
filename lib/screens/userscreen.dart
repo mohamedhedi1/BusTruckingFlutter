@@ -20,13 +20,14 @@ class _UserInfoSheet extends State<UserInfoSheet> {
    @override
   void initState() {
     super.initState();
-    ApiService.getUserByUser("UHUKILF553").then((data){
+   /*
+    ApiService.userByCode("UHUKILF553").then((data){
       setState(() {
         user = data;
         usercode = data.userCode;
 
       });
-    });
+    });*/
  /*void startUpdatingMarkerPosition() {
     Timer.periodic(Duration(seconds: 1), (timer) async {
       Map<String, double> positionData = await ApiService.getPositionById(1);

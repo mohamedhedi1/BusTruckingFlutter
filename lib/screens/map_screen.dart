@@ -41,6 +41,7 @@ class _MapScreenState extends State<MapScreen> {
   final Geolocator geolocator = Geolocator();
   bool isVisible = false;
   int id=0;
+  List<LatLng> list1 = [];
   
   
 
@@ -58,6 +59,11 @@ class _MapScreenState extends State<MapScreen> {
         stationList = list as List<Station>;
       });
     });
+    ApiService.getRoutePoints().then((list) {
+      setState(() {
+      busPath = list as List<LatLng>;
+    });
+     });
     
     final currentTime = TimeOfDay.now();
     if (currentTime.hour >= 22 || currentTime.hour <= 10) {
@@ -89,9 +95,8 @@ class _MapScreenState extends State<MapScreen> {
       send.add(";");
       ApiService.getRoutePoints(send).then((list) { setState(() {*/ 
       ApiService.getRoutePoints().then((list) { setState(() {
-        busPath = list;
-      isVisible = !isVisible;  
-  
+       busPath = list;
+      isVisible = !isVisible;
       });}); 
       }
 
@@ -217,13 +222,16 @@ Widget build(BuildContext context) {
               child: Icon(Icons.directions),
               backgroundColor: Colors.blue,
               tooltip: 'Get Road',
+              
             ),
           ),
 
    PolylineLayer(
-          polylines: [
+    polylineCulling: false,
+    polylines: [
             Polyline(
-              points: movingbus,
+              points:busPath 
+,
               color: Color.fromARGB(255, 182, 15, 32),
               strokeWidth: 4.0,
             ),
