@@ -1,9 +1,12 @@
-/*
+
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:login_screen/utils/constants.dart';
+import '../../../services/api_service.dart';
+import '../../../utils/constants.dart';
+import '../../map_screen.dart';
+
 
 
 class LoginContent extends StatefulWidget {
@@ -27,8 +30,8 @@ class _LoginContentState extends State<LoginContent> {
       if (hint == 'Matricule') {
         if (matriculeController.text.isEmpty) {
           errorMsg = 'Matricule is required';
-        } else if (matriculeController.text.length != 6) {
-          errorMsg = 'Matricule must be 6 characters long';
+        } else if (matriculeController.text.length <= 6) {
+          errorMsg = 'Matricule must be minimum 6 characters long';
         }
       } else if (hint == 'Mot De Passe') {
         if (passwordController.text.isEmpty) {
@@ -155,7 +158,7 @@ class _LoginContentState extends State<LoginContent> {
           setState(() {
             formSubmitted = true;
             matriculeError =
-                matriculeController.text.isEmpty || matriculeController.text.length != 6;
+                matriculeController.text.isEmpty || matriculeController.text.length <= 6;
             passwordError = passwordController.text.isEmpty;
           });
 
@@ -167,12 +170,12 @@ class _LoginContentState extends State<LoginContent> {
             ));
           } else {
             // Perform login here
-            final success = await AuthService().login(
+            final success = await ApiService.login(
               context,
               matriculeController.text,
               passwordController.text,
             );
-            if (!success) {
+            if (success == false) {
               // Login failed
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Login failed. Please check your credentials.'),
@@ -199,62 +202,3 @@ class _LoginContentState extends State<LoginContent> {
     );
   }
 }
-
-class AuthService {
-  // Replace these URLs with your actual API endpoints
-  static const String baseUrl = 'http://10.0.2.2:8080/Humeur_salarie/api';
-  static const String loginUrl = 'http://10.0.2.2:8080/Humeur_salarie/api/login';
-
-  Future<bool> login(BuildContext context, String matricule, String mdp) async {
-    try {
-      final response = await http.post(
-        Uri.parse(loginUrl),
-        headers: {
-          'Content-Type': 'application/json', // Specify that you are sending JSON data
-        },
-        body: json.encode({ // Use the json.encode method to convert the data to JSON format
-          'matricule': matricule,
-          'mdp': mdp,
-        }),
-      );
-      print('Response Body: ${response.body}');
-
-      if (response.statusCode >= 200) {
-        // Login successful
-        final data = json.decode(response.body);
-        // Replace 'success' with the key that indicates a successful login in your API response
-        bool loginSuccess = data['success'] ?? false;
-        if (loginSuccess) {
-          // Check the role and navigate accordingly
-          String role = data['role'];
-          if (role == 'manager') {
-            // Navigate to HomeManagerPage for managers
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => HomeManagerPage(),
-              ),
-            );
-          } else if (role == 'employee') {
-            // Navigate to HomePage for employees
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => HomePage(matricule: matricule), // Pass the matricule here
-              ),
-            );
-          }
-        }
-        return loginSuccess;
-      } else {
-        // Login failed
-        print('Login failed. Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      // Error occurred during login
-      print('Error during login: $e');
-      return false;
-    }
-  }
-}
-*/
