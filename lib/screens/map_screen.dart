@@ -9,6 +9,8 @@ import '../models/Station.dart';
 import '../services/location_service.dart';
 import '../screens/userscreen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geocoding/geocoding.dart';
+
 import 'package:geolocator/geolocator.dart';
 
 
@@ -19,21 +21,26 @@ class MapScreen extends StatefulWidget {
   _MapScreenState createState() => _MapScreenState();
 }
 
+
 class _MapScreenState extends State<MapScreen> {
-  LatLng busPosition = LatLng(35.83168535761309, 10.233006581002806);
-  LatLng  myPosition = LatLng(35.83168535761309, 10.233006581002806);
+  LatLng busPosition = LatLng(0, 0);
+  LatLng  myPosition = LatLng(0, 0);
  // late LatLng myPosition ;
   List<Station> stationList = [];
+
    bool isNightTime = false;
    final dayTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   final nightTileUrl = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png";
   final MapController mapController = MapController();
   List<LatLng> busPath = [];
+    List<LatLng> movingbus = [];
   bool initialPositionReceived = false; 
   LatLng previousBusPosition = LatLng(0, 0); // List to store bus path points
   late Bus bus;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =FlutterLocalNotificationsPlugin();
-final Geolocator geolocator = Geolocator();
+  final Geolocator geolocator = Geolocator();
+  bool isVisible = false;
+  int id=0;
   
   
 
@@ -62,19 +69,44 @@ final Geolocator geolocator = Geolocator();
    // startUpdatingMarkerPosition();
 
     //tester bus by userid
-    ApiService.getBusbyUserId(1).then((data){
+   /* ApiService.getBusbyUserId(1).then((data){
       setState(() {
         bus = data;
        // circuitId = data.circuit.id;
 
       });
     });
+    */
 
   }
 
-  void startUpdatingMarkerPosition() {
+  void PointForPolyline()async {
+     /* List<String> send=[];
+      List<Station> stationList = await ApiService.getListStationByCircuitId(1);
+      for (var station in stationList) {
+      send.add("${station.latitudePosition}".toString(),);
+      send.add("${station.longitudePosition}".toString());}
+      send.add(";");
+      ApiService.getRoutePoints(send).then((list) { setState(() {*/ 
+      ApiService.getRoutePoints().then((list) { setState(() {
+        busPath = list;
+      isVisible = !isVisible;  
+  
+      });}); 
+      }
+
+
+ void startUpdatingMarkerPosition() {
     Timer.periodic(Duration(seconds: 1), (timer) async {
-      Map<String, double> positionData = await ApiService.getPositionById(1);
+       ApiService.getBusbyUserId(1).then((data){
+      setState(() {
+        bus = data;
+       // circuitId = data.circuit.id;
+
+      });
+    });
+    id=bus.id;
+      Map<String, double> positionData = await ApiService.getPositionById(id);
       setState(() {
         busPosition = LatLng(positionData['lat']!, positionData['long']!);
       });
@@ -143,7 +175,7 @@ Widget build(BuildContext context) {
           mapController: mapController,
           options: MapOptions(
             center: busPosition,
-            zoom:10.0,
+            zoom:2.0,
           ),
           children: [
             TileLayer(
@@ -153,54 +185,67 @@ Widget build(BuildContext context) {
             MarkerLayer(
               markers: [
                 Marker(
-                  width: 30.0,
-                  height: 30.0,
+                  width: 150.0,
+                  height: 150.0,
                   point: busPosition,
                   builder: (ctx) =>
                       Container(child: Icon(Icons.directions_bus, size: 17, color: Colors.red)),
                 ),
                 Marker(
-                  width: 60.0,
-                  height: 60.0,
+                  width: 130.0,
+                  height:130.0,
                   point: myPosition,
                   builder: (ctx) =>
                       Container(child: Icon(Icons.person_pin_circle, size: 19, color: Colors.blue)),
                 ),
                 for (var station in stationList)
                   Marker(
-                    width: 40.0,
-                    height: 40.0,
+                    width: 150.0,
+                    height: 150.0,
                     point: LatLng(station.latitudePosition, station.longitudePosition),
                     builder: (ctx) =>
-                        Container(child: Icon(Icons.location_on, size: 20, color: Colors.green)),
-                  ),
+         
+            Container(child: Icon(Icons.circle, size: 20, color: Colors.green)),
+          ),
+          
               ],
             ),
-             PolylineLayer(
+             Positioned(
+            bottom: 150.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: PointForPolyline,
+              child: Icon(Icons.directions),
+              backgroundColor: Colors.blue,
+              tooltip: 'Get Road',
+            ),
+          ),
+
+   PolylineLayer(
           polylines: [
             Polyline(
-              points: busPath,
+              points: movingbus,
               color: Color.fromARGB(255, 182, 15, 32),
               strokeWidth: 4.0,
             ),
           ],
-        ),
+   ),     
           ],
         ),
         DraggableScrollableSheet(
-          initialChildSize: 0.1,
+          initialChildSize:0.2,
           minChildSize: 0.1,
-          maxChildSize: 0.6,
+          maxChildSize: 0.9,
           builder: (BuildContext context, ScrollController scrollController) {
             return UserInfoSheet(); // Replace with your user info widget
           },
         ),
         Positioned(
-  top: 32.0, // Adjust this value to move the compass icon down
-  right: 16.0,
-  child: GestureDetector(
-    onTap: () {
-      mapController.rotate(0.0); // Reset the map rotation
+           top: 32.0, // Adjust this value to move the compass icon down
+           right: 16.0,
+           child: GestureDetector(
+           onTap: () {
+           mapController.rotate(0.0); // Reset the map rotation
     },
     child: Container(
       padding: EdgeInsets.all(8.0),
@@ -248,8 +293,7 @@ Widget build(BuildContext context) {
         ],
       ),
     ),
-      ),
-  ),
-  );
-  }
+   ),
+),
+);}
 }

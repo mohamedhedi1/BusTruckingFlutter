@@ -39,55 +39,33 @@ class _UserInfoSheet extends State<UserInfoSheet> {
 
   }
   
-@override
+ @override
 Widget build(BuildContext context) {
   return Container(
+    padding: EdgeInsets.all(16.0),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)), // Rounded top edges
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 10.0,
+        ),
+      ],
     ),
-    child: Column(
+    child: Row( // Use Row instead of Column
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          height: 4,
-          width: 40,
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 125, 128, 185),
-            borderRadius: BorderRadius.circular(2),
-          ),
+        CircleAvatar(
+          radius: 20,
+          backgroundImage: 
+          AssetImage('assets/userImage.jpg'), 
         ),
-        SizedBox(height: 16),
+        SizedBox(width: 8.0),
         Text(
-          'User Information',
+          usercode,
           style: TextStyle(
-          fontFamily: 'MontserratAlternates', // Use the defined font family
-          fontWeight: FontWeight.bold, // Use the desired font weight
-          fontSize: 18, // Adjust the font size
-),
-        ),
-        SizedBox(height: 8),
-        Expanded(
-          child: ListView(
-            shrinkWrap: true, // Allow content to scroll if necessary
-            children: [
-              SizedBox(height: 8),
-              Center( // Center the user code text
-                child: Text(
-                  usercode,
-                  style: TextStyle(
-                    fontSize: 24, // Adjust the font size
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic, // Apply italic font style
-                  ),
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(usercode),
-              SizedBox(height: 8),
-              Text('Bus Name: Bus123'),
-              SizedBox(height: 8),
-            ],
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -95,4 +73,3 @@ Widget build(BuildContext context) {
   );
 }
 }
- 
