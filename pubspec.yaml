@@ -40,7 +40,9 @@ dependencies:
   flutter_map: ^5.0.0
   latlong2: ^0.9.0
   geolocator: ^9.0.2
+  flutter_typeahead: ^4.6.2
   ionicons: ^0.1.2
+  flutter_local_notifications: ^15.1.0+1
 
 
 
@@ -83,6 +85,8 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   # fonts:
+ 
+         
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
