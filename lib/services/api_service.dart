@@ -10,7 +10,7 @@ import '../screens/map_screen.dart';
 
 class ApiService {
   static Future<List<Station>> getListStationByCircuitId(int id) async {
-    var baseUrl = "http://10.0.2.2:8080/Circuit/StationsbyCircuitId/$id";
+    var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl));
 
@@ -45,7 +45,7 @@ class ApiService {
   }
 
   static Future<Map<String, double>> getPositionById(id) async {
-    var baseurl = "http://10.0.2.2:8080/Bus/getPositionById/$id";
+    var baseurl = "http://localhost:8080/Bus/getPositionById/$id";
     var response = await http.get(Uri.parse(baseurl));
     final data = jsonDecode(response.body);
     print("hello bus positionnnnnnnnnnnnnnnnnnnnnnnn");
@@ -59,9 +59,9 @@ class ApiService {
   
 
   static Future<Bus> getBusbyUserId(id) async {
-    var baseurl = "http://10.0.2.2:8080/User/busbyiduser/$id";
+    var baseurl = "http://localhost:8080/User/busbyiduser/$id";
     var response = await http.get(Uri.parse(baseurl));
-
+print("busssssssssssssssssssssssssssssssssssssssssssssssssssssss");
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       print(data);
@@ -119,6 +119,7 @@ class ApiService {
       if (response.statusCode >= 200) {
         final data = json.decode(response.body);
         final User user = await userByCode(matricule, data['access_token']);
+        print(user);
         print("User role:");
         print(user.role);
         print( data['access_token'] );

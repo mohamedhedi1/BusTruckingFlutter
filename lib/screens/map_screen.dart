@@ -33,6 +33,7 @@ class _MapScreenState extends State<MapScreen> {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =FlutterLocalNotificationsPlugin();
   final Geolocator geolocator = Geolocator();
   int id=0;
+  List<LatLng> movingbuspath = [];
 
   
   
@@ -60,6 +61,7 @@ class _MapScreenState extends State<MapScreen> {
         });
       });
     });
+    startUpdatingMarkerPosition();
   }
 
   /*void PointForPolyline(stationList)async {
@@ -72,7 +74,7 @@ class _MapScreenState extends State<MapScreen> {
 
  void startUpdatingMarkerPosition() {
     Timer.periodic(Duration(seconds: 1), (timer) async {
-       ApiService.getBusbyUserId(1).then((data){
+       ApiService.getBusbyUserId(153).then((data){
       setState(() {
         bus = data;
        // circuitId = data.circuit.id;
@@ -83,15 +85,15 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         busPosition = LatLng(positionData['lat']!, positionData['long']!);
       });
-    
+
       setState(() {});
-      
+
     setState(() {
         if (!initialPositionReceived) {
-          busPath.add(busPosition); // Add the initial position to the list
+          movingbuspath.add(busPosition); // Add the initial position to the list
           initialPositionReceived = true;
         } else {
-          busPath.add(busPosition); // Add subsequent positions to the list
+          movingbuspath.add(busPosition); // Add subsequent positions to the list
         }
       });
     });
@@ -193,11 +195,22 @@ Widget build(BuildContext context) {
             Polyline(
               points:busPath
 ,
-              color: Color.fromARGB(255, 182, 15, 32),
+              color: Color.fromARGB(173, 165, 158, 158),
               strokeWidth: 4.0,
             ),
           ],
    ),
+            PolylineLayer(
+              polylineCulling: false,
+              polylines: [
+                Polyline(
+                  points:movingbuspath
+                  ,
+                  color: Color.fromARGB(255, 154, 4, 21),
+                  strokeWidth: 4.0,
+                ),
+              ],
+            )
           ],
         ),
         DraggableScrollableSheet(
