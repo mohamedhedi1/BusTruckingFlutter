@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My Map App',
-      home: MapScreen() ,
+      home: LoginScreen() ,
       //MapScreen(), // Utilisez la classe MapScreen comme page d'accueil
     );
   }

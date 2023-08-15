@@ -9,8 +9,6 @@ import '../models/Station.dart';
 import '../services/location_service.dart';
 import '../screens/userscreen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geocoding/geocoding.dart';
-
 import 'package:geolocator/geolocator.dart';
 
 
@@ -25,12 +23,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   LatLng busPosition = LatLng(0, 0);
   LatLng  myPosition = LatLng(0, 0);
- // late LatLng myPosition ;
   List<Station> stationList = [];
-
-   bool isNightTime = false;
-   final dayTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-  final nightTileUrl = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png";
   final MapController mapController = MapController();
   List<LatLng> busPath = [];
     List<LatLng> movingbus = [];
@@ -39,9 +32,8 @@ class _MapScreenState extends State<MapScreen> {
   late Bus bus;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =FlutterLocalNotificationsPlugin();
   final Geolocator geolocator = Geolocator();
-  bool isVisible = false;
   int id=0;
-  List<LatLng> list1 = [];
+
   
   
 
@@ -57,48 +49,25 @@ class _MapScreenState extends State<MapScreen> {
     ApiService.getListStationByCircuitId(1).then((list) {
       setState(() {
         stationList = list as List<Station>;
+        print("liste statiooooooonsssssssssssss");
+        print(stationList);
+
+        // Maintenant que vous avez stationList mise à jour, appelez la fonction getRoutePoints
+        ApiService.getRoutePoints(stationList).then((list) {
+          setState(() {
+            busPath = list as List<LatLng>;
+          });
+        });
       });
     });
-    ApiService.getRoutePoints().then((list) {
-      setState(() {
-      busPath = list as List<LatLng>;
-    });
-     });
-    
-    final currentTime = TimeOfDay.now();
-    if (currentTime.hour >= 22 || currentTime.hour <= 10) {
-      setState(() {
-        isNightTime = true;
-      });
-    }
-
-   // startUpdatingMarkerPosition();
-
-    //tester bus by userid
-   /* ApiService.getBusbyUserId(1).then((data){
-      setState(() {
-        bus = data;
-       // circuitId = data.circuit.id;
-
-      });
-    });
-    */
-
   }
 
-  void PointForPolyline()async {
-     /* List<String> send=[];
-      List<Station> stationList = await ApiService.getListStationByCircuitId(1);
-      for (var station in stationList) {
-      send.add("${station.latitudePosition}".toString(),);
-      send.add("${station.longitudePosition}".toString());}
-      send.add(";");
-      ApiService.getRoutePoints(send).then((list) { setState(() {*/ 
-      ApiService.getRoutePoints().then((list) { setState(() {
+  /*void PointForPolyline(stationList)async {
+      ApiService.getRoutePoints(stationList).then((list) { setState(() {
        busPath = list;
-      isVisible = !isVisible;
+
       });}); 
-      }
+      }*/
 
 
  void startUpdatingMarkerPosition() {
@@ -128,14 +97,6 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-TileLayer _getTileLayerOptions() {
-    final tileUrl = isNightTime ? nightTileUrl : dayTileUrl;
-
-    return TileLayer(
-      urlTemplate: tileUrl,
-      subdomains: ['a', 'b', 'c'],
-    );
-  }
   void _goToMyPosition() {
     if (myPosition != null) {
       mapController.move(myPosition, 15.0);
@@ -214,7 +175,7 @@ Widget build(BuildContext context) {
           
               ],
             ),
-             Positioned(
+       /*      Positioned(
             bottom: 150.0,
             right: 16.0,
             child: FloatingActionButton(
@@ -222,21 +183,21 @@ Widget build(BuildContext context) {
               child: Icon(Icons.directions),
               backgroundColor: Colors.blue,
               tooltip: 'Get Road',
-              
+
             ),
-          ),
+          ),*/
 
    PolylineLayer(
     polylineCulling: false,
     polylines: [
             Polyline(
-              points:busPath 
+              points:busPath
 ,
               color: Color.fromARGB(255, 182, 15, 32),
               strokeWidth: 4.0,
             ),
           ],
-   ),     
+   ),
           ],
         ),
         DraggableScrollableSheet(

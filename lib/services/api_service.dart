@@ -6,15 +6,11 @@ import '../models/Bus.dart';
 import '../models/Station.dart';
 import '../models/User.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:geocoding/geocoding.dart';
-
-
-
 import '../screens/map_screen.dart';
 
 class ApiService {
   static Future<List<Station>> getListStationByCircuitId(int id) async {
-    var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
+    var baseUrl = "http://10.0.2.2:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl));
 
@@ -123,16 +119,11 @@ class ApiService {
       if (response.statusCode >= 200) {
         final data = json.decode(response.body);
         final User user = await userByCode(matricule, data['access_token']);
-
         print("User role:");
         print(user.role);
-
-        print("tokeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeen");
         print( data['access_token'] );
-
-
         if (user.role== 'USER') {
-          print("777777777777777777777777777777777777777777777777777777777777777777777777");
+
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) => MapScreen(),
@@ -140,12 +131,9 @@ class ApiService {
           );
           return true;
         }
-          print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         return true;
-
-
       }else {
-        print("hellooooooooooooooooooooooooooooooooooooooooooooo");
+
         print(response.statusCode);
         return false;
       }
@@ -159,38 +147,23 @@ class ApiService {
 
 
 
-   static  Future<List<LatLng>> getRoutePoints() async {
-    //   static  Future<List<LatLng>> getRoutePoints(List pointValues) async {
+   static  Future<List<LatLng>> getRoutePoints(List<Station> l) async {
+    print(l);
+    String listchainepath ="";
+    for(var station in l)
+      {
+        print(station.station);
+        print(station.longitudePosition);
+        print(station.latitudePosition);
+        listchainepath = listchainepath + "${station.longitudePosition},${station.latitudePosition};";
+      }
+        String nouvelleChaine = listchainepath.substring(0, listchainepath.length - 1);
+        var baseurl = 'http://router.project-osrm.org/route/v1/driving/${nouvelleChaine}?steps=true&annotations=true&geometries=geojson&overview=full';
 
- /*   List<String> formattedPairs = [];
-    for (int i = 0; i < pointValues.length; i += 2) {
-   
-    double lon = pointValues[i + 1];
-    double lat = pointValues[i];
-    formattedPairs.add('$lat,$lon');
-}
-String point = formattedPairs.join(';');
-    var baseurl="http://router.project-osrm.org/route/v1/driving/$point?steps=true&annotations=true&geometries=geojson&overview=full";*/
-                   
-                     
-                      var v1 =  10.21822793177027;
-                      var v2 = 36.84843549171408;
-                      var v3 = 10.203546537447805;
-                      var v4 = 36.82752985055981;
-                      print("v1=$v1");
-                      print("v2=$v2");
-                      print("v3=$v3");
-                      print("v4=$v4");
-                      var baseurl = 'http://router.project-osrm.org/route/v1/driving/$v1,$v2;$v3,$v4?steps=true&annotations=true&geometries=geojson&overview=full';
-  
     var response = await http.get(Uri.parse(baseurl));
     
     if (response.statusCode == 200) {
       final routeData = jsonDecode(response.body)['routes'][0]['geometry']['coordinates'];
-      print('iam heeeeeeeeeeeeeeeeeeeeeeeeeere');
-      print("0routadataaaaaaaaaaaaaaaaaaa$routeData");
-      
-
       List<LatLng> routePoints = [];
       
        for(int i=0; i< routeData.length; i++){
@@ -201,7 +174,6 @@ String point = formattedPairs.join(';');
                           var long1 = reep.split(",");
                           routePoints.add(LatLng( double.parse(lat1[1]), double.parse(long1[0])));
                         }
-            print('i get ittttttttttttttttttttttttttt');
       return routePoints;
     } else {
       throw Exception('Failed to fetch route points');
