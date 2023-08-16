@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/Bus.dart';
@@ -8,8 +10,11 @@ import '../services/api_service.dart';
 import '../models/Station.dart';
 import '../services/location_service.dart';
 import '../screens/userscreen.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
 
 
 
@@ -30,10 +35,11 @@ class _MapScreenState extends State<MapScreen> {
   bool initialPositionReceived = false; 
   LatLng previousBusPosition = LatLng(0, 0); // List to store bus path points
   late Bus bus;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =FlutterLocalNotificationsPlugin();
   final Geolocator geolocator = Geolocator();
   int id=0;
   List<LatLng> movingbuspath = [];
+
+  bool notifieddistance = false;
 
   
   
@@ -62,14 +68,62 @@ class _MapScreenState extends State<MapScreen> {
       });
     });
     startUpdatingMarkerPosition();
+    sendNotification();
+
+
+
+  }
+  void sendNotification() async {
+    double distance = calculateDistance(
+        bus.latitude, bus.longitude, myPosition.latitude, myPosition.longitude);
+
+    if (distance < 1.0 && !notifieddistance) {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+        'your_channel_id', // ID du canal de notification
+        'Channel Name', // Nom du canal
+        'Channel Description', // Description du canal
+        importance: Importance.max,
+        priority: Priority.high,
+      );
+
+      const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+      await flutterLocalNotificationsPlugin.show(
+        0, // ID de la notification
+        'Bus Arrival', // Titre de la notification
+        'The bus arrives in 5min', // Contenu de la notification
+        platformChannelSpecifics,
+        payload: 'notification',
+      );
+
+      setState(() {
+        notifieddistance = true;
+      });
+    }
   }
 
-  /*void PointForPolyline(stationList)async {
-      ApiService.getRoutePoints(stationList).then((list) { setState(() {
-       busPath = list;
 
-      });}); 
-      }*/
+
+
+
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const double earthRadius = 6371; // Rayon de la Terre en kilomètres
+
+    final double dLat = (lat2 - lat1) * pi / 180.0;
+    final double dLon = (lon2 - lon1) * pi / 180.0;
+
+    final double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1 * pi / 180.0) * cos(lat2 * pi / 180.0) *
+            sin(dLon / 2) * sin(dLon / 2);
+
+    final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    final double distance = earthRadius * c; // Distance en kilomètres
+
+    return distance;
+  }
 
 
  void startUpdatingMarkerPosition() {
