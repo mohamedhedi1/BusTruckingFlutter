@@ -16,28 +16,22 @@ class UserInfoSheet extends StatefulWidget {
 class _UserInfoSheet extends State<UserInfoSheet> {
    late User user;
     String usercode = "";
+    String nom = "";
+
 
    @override
   void initState() {
     super.initState();
-   /*
-    ApiService.userByCode("UHUKILF553").then((data){
+
+    ApiService.userByCode("azertyui","").then((data){
       setState(() {
+
         user = data;
-        usercode = data.userCode;
+        nom = "${user.prenom} ${user.nom}";
+        print(user.nom);
 
       });
-    });*/
- /*void startUpdatingMarkerPosition() {
-    Timer.periodic(Duration(seconds: 1), (timer) async {
-      Map<String, double> positionData = await ApiService.getPositionById(1);
-        busPosition = LatLng(positionData['lat']!, positionData['long']!);
-      setState(() {});
-    
     });
-  }*/
-
-
   }
   
  @override
@@ -57,16 +51,19 @@ Widget build(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         CircleAvatar(
-          radius: 20,
+          radius: 25,
           backgroundImage: 
           AssetImage('assets/userImage.jpg'), 
         ),
         SizedBox(width: 8.0),
         Text(
-          usercode,
+          nom,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 24, // Augmentez la taille de la police pour un impact visuel plus fort
             fontWeight: FontWeight.bold,
+            color: Colors.black26, // Changez la couleur du texte
+            letterSpacing: 1.5, // Ajoutez de l'espacement entre les lettres
+            fontStyle: FontStyle.italic, // Utilisez une police italique
           ),
         ),
       ],

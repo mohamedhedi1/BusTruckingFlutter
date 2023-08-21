@@ -12,8 +12,9 @@ import '../services/location_service.dart';
 import '../screens/userscreen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+/*FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
+ */
 
 
 
@@ -68,11 +69,11 @@ class _MapScreenState extends State<MapScreen> {
       });
     });
     startUpdatingMarkerPosition();
-    sendNotification();
+    //sendNotification();
 
 
 
-  }
+  }/*
   void sendNotification() async {
     double distance = calculateDistance(
         bus.latitude, bus.longitude, myPosition.latitude, myPosition.longitude);
@@ -103,6 +104,7 @@ class _MapScreenState extends State<MapScreen> {
       });
     }
   }
+  */
 
 
 
@@ -170,7 +172,7 @@ Widget build(BuildContext context) {
       home: Scaffold(
           appBar: AppBar(
     title: Text(
-      'Track order',
+      'BusTracking',
       style: TextStyle(
          fontFamily: 'MontserratAlternates', 
     fontWeight: FontWeight.normal,
@@ -268,7 +270,7 @@ Widget build(BuildContext context) {
           ],
         ),
         DraggableScrollableSheet(
-          initialChildSize:0.2,
+          initialChildSize:0.12,
           minChildSize: 0.1,
           maxChildSize: 0.9,
           builder: (BuildContext context, ScrollController scrollController) {

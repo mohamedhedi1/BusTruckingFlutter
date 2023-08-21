@@ -75,7 +75,7 @@ print("busssssssssssssssssssssssssssssssssssssssssssssssssssssss");
   }
 
   static Future<User> userByCode(String matricule, String accessToken) async {
-    var baseUrl = "http://10.0.2.2:8080/User/Code/$matricule";
+    var baseUrl = "http://localhost:8080/User/Code/$matricule";
 
     try {
       final response = await http.get(
@@ -104,7 +104,7 @@ print("busssssssssssssssssssssssssssssssssssssssssssssssssssssss");
 
 
   static  Future<bool> login(BuildContext context, String matricule, String mdp) async {
-    var  loginUrl = "http://10.0.2.2:8080/authenticate/login";
+    var  loginUrl = "http://localhost:8080/authenticate/login";
     try {
       final response = await http.post(
         Uri.parse(loginUrl),
