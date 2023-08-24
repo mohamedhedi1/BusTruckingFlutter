@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/Bus.dart';
+import '../models/User.dart';
 import '../services/api_service.dart';
 import '../models/Station.dart';
 import '../services/location_service.dart';
@@ -21,12 +22,20 @@ FlutterLocalNotificationsPlugin();
 
 
 class MapScreen extends StatefulWidget {
+  final User user;
+  final String access_token;
+  MapScreen(this.user, this.access_token);
+
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
 
 
 class _MapScreenState extends State<MapScreen> {
+
+
+
   LatLng busPosition = LatLng(0, 0);
   LatLng  myPosition = LatLng(0, 0);
   List<Station> stationList = [];
@@ -42,6 +51,8 @@ class _MapScreenState extends State<MapScreen> {
 
   bool notifieddistance = false;
 
+
+
   
   
 
@@ -54,7 +65,7 @@ class _MapScreenState extends State<MapScreen> {
         myPosition = myPositionResult;
       });
     });
-    ApiService.getListStationByCircuitId(1).then((list) {
+    ApiService.getListStationByCircuitId(widget.user.bus?.circuit?.id ?? 0, widget.access_token).then((list) {
       setState(() {
         stationList = list as List<Station>;
         print("liste statiooooooonsssssssssssss");
@@ -68,43 +79,10 @@ class _MapScreenState extends State<MapScreen> {
         });
       });
     });
-    startUpdatingMarkerPosition();
+    startUpdatingMarkerPosition(widget.access_token);
     //sendNotification();
 
-
-
-  }/*
-  void sendNotification() async {
-    double distance = calculateDistance(
-        bus.latitude, bus.longitude, myPosition.latitude, myPosition.longitude);
-
-    if (distance < 1.0 && !notifieddistance) {
-      const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-        'your_channel_id', // ID du canal de notification
-        'Channel Name', // Nom du canal
-        'Channel Description', // Description du canal
-        importance: Importance.max,
-        priority: Priority.high,
-      );
-
-      const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
-
-      await flutterLocalNotificationsPlugin.show(
-        0, // ID de la notification
-        'Bus Arrival', // Titre de la notification
-        'The bus arrives in 5min', // Contenu de la notification
-        platformChannelSpecifics,
-        payload: 'notification',
-      );
-
-      setState(() {
-        notifieddistance = true;
-      });
-    }
   }
-  */
 
 
 
@@ -128,16 +106,16 @@ class _MapScreenState extends State<MapScreen> {
   }
 
 
- void startUpdatingMarkerPosition() {
+ void startUpdatingMarkerPosition(access_token) {
     Timer.periodic(Duration(seconds: 1), (timer) async {
-       ApiService.getBusbyUserId(153).then((data){
+       ApiService.getBusbyUserId(widget.user.id ,access_token).then((data){
       setState(() {
         bus = data;
        // circuitId = data.circuit.id;
 
       });
     });
-      Map<String, double> positionData = await ApiService.getPositionById(bus.id);
+      Map<String, double> positionData = await ApiService.getPositionById(bus.id,widget.access_token);
       setState(() {
         busPosition = LatLng(positionData['lat']!, positionData['long']!);
       });
@@ -334,3 +312,38 @@ Widget build(BuildContext context) {
 ),
 );}
 }
+
+
+
+/*
+  void sendNotification() async {
+    double distance = calculateDistance(
+        bus.latitude, bus.longitude, myPosition.latitude, myPosition.longitude);
+
+    if (distance < 1.0 && !notifieddistance) {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+        'your_channel_id', // ID du canal de notification
+        'Channel Name', // Nom du canal
+        'Channel Description', // Description du canal
+        importance: Importance.max,
+        priority: Priority.high,
+      );
+
+      const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+      await flutterLocalNotificationsPlugin.show(
+        0, // ID de la notification
+        'Bus Arrival', // Titre de la notification
+        'The bus arrives in 5min', // Contenu de la notification
+        platformChannelSpecifics,
+        payload: 'notification',
+      );
+
+      setState(() {
+        notifieddistance = true;
+      });
+    }
+  }
+  */

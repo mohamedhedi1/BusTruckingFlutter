@@ -9,10 +9,13 @@ import 'package:latlong2/latlong.dart';
 import '../screens/map_screen.dart';
 
 class ApiService {
-  static Future<List<Station>> getListStationByCircuitId(int id) async {
+  static Future<List<Station>> getListStationByCircuitId(int id, String  accessToken) async {
     var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
     try {
-      var response = await http.get(Uri.parse(baseUrl));
+      var response = await http.get(Uri.parse(baseUrl), headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      });
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonResponse = jsonDecode(response.body);
@@ -44,9 +47,12 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, double>> getPositionById(id) async {
+  static Future<Map<String, double>> getPositionById(id,accessToken) async {
     var baseurl = "http://localhost:8080/Bus/getPositionById/$id";
-    var response = await http.get(Uri.parse(baseurl));
+    var response = await http.get(Uri.parse(baseurl), headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    });
     final data = jsonDecode(response.body);
     print("hello bus positionnnnnnnnnnnnnnnnnnnnnnnn");
     print(data);
@@ -58,10 +64,12 @@ class ApiService {
     
   
 
-  static Future<Bus> getBusbyUserId(id) async {
+  static Future<Bus> getBusbyUserId(id,String accessToken) async {
     var baseurl = "http://localhost:8080/User/busbyiduser/$id";
-    var response = await http.get(Uri.parse(baseurl));
-print("busssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+    var response = await http.get(Uri.parse(baseurl) , headers: {
+    'Authorization': 'Bearer $accessToken',
+    'Content-Type': 'application/json',
+    });
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       print(data);
@@ -127,7 +135,7 @@ print("busssssssssssssssssssssssssssssssssssssssssssssssssssssss");
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (_) => MapScreen(),
+              builder: (_) => MapScreen(user, data['access_token']),
             ),
           );
           return true;
