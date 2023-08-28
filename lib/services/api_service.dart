@@ -9,7 +9,8 @@ import 'package:latlong2/latlong.dart';
 import '../screens/map_screen.dart';
 
 class ApiService {
-  static Future<List<Station>> getListStationByCircuitId(int id, String  accessToken) async {
+  static Future<List<Station>> getListStationByCircuitId(int id,
+      String accessToken) async {
     var baseUrl = "http://localhost:8080/Circuit/StationsbyCircuitId/$id";
     try {
       var response = await http.get(Uri.parse(baseUrl), headers: {
@@ -47,7 +48,7 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, double>> getPositionById(id,accessToken) async {
+  static Future<Map<String, double>> getPositionById(id, accessToken) async {
     var baseurl = "http://localhost:8080/Bus/getPositionById/$id";
     var response = await http.get(Uri.parse(baseurl), headers: {
       'Authorization': 'Bearer $accessToken',
@@ -61,14 +62,12 @@ class ApiService {
     return {'lat': lat, 'long': long};
   }
 
-    
-  
 
-  static Future<Bus> getBusbyUserId(id,String accessToken) async {
+  static Future<Bus> getBusbyUserId(id, String accessToken) async {
     var baseurl = "http://localhost:8080/User/busbyiduser/$id";
-    var response = await http.get(Uri.parse(baseurl) , headers: {
-    'Authorization': 'Bearer $accessToken',
-    'Content-Type': 'application/json',
+    var response = await http.get(Uri.parse(baseurl), headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
     });
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -99,7 +98,6 @@ class ApiService {
         print(data);
         User user = User.fromJson(data);
         return user;
-
       } else {
         print("Erreur de requête - Statut ${response.statusCode}");
         throw Exception("Erreur de requête");
@@ -111,8 +109,9 @@ class ApiService {
   }
 
 
-  static  Future<bool> login(BuildContext context, String matricule, String mdp) async {
-    var  loginUrl = "http://localhost:8080/authenticate/login";
+  static Future<bool> login(BuildContext context, String matricule,
+      String mdp) async {
+    var loginUrl = "http://localhost:8080/authenticate/login";
     try {
       final response = await http.post(
         Uri.parse(loginUrl),
@@ -120,8 +119,8 @@ class ApiService {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          "userCode" : matricule ,
-          "password" : mdp
+          "userCode": matricule,
+          "password": mdp
         }),
       );
       if (response.statusCode >= 200) {
@@ -130,9 +129,8 @@ class ApiService {
         print(user);
         print("User role:");
         print(user.role);
-        print( data['access_token'] );
-        if (user.role== 'USER') {
-
+        print(data['access_token']);
+        if (user.role == 'USER') {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) => MapScreen(user, data['access_token']),
@@ -141,8 +139,7 @@ class ApiService {
           return true;
         }
         return true;
-      }else {
-
+      } else {
         print(response.statusCode);
         return false;
       }
@@ -154,39 +151,60 @@ class ApiService {
   }
 
 
-
-
-   static  Future<List<LatLng>> getRoutePoints(List<Station> l) async {
+  static Future<List<LatLng>> getRoutePoints(List<Station> l) async {
     print(l);
-    String listchainepath ="";
-    for(var station in l)
-      {
-        print(station.station);
-        print(station.longitudePosition);
-        print(station.latitudePosition);
-        listchainepath = listchainepath + "${station.longitudePosition},${station.latitudePosition};";
-      }
-        String nouvelleChaine = listchainepath.substring(0, listchainepath.length - 1);
-        var baseurl = 'http://router.project-osrm.org/route/v1/driving/${nouvelleChaine}?steps=true&annotations=true&geometries=geojson&overview=full';
+    String listchainepath = "";
+    for (var station in l) {
+      print(station.station);
+      print(station.longitudePosition);
+      print(station.latitudePosition);
+      listchainepath = listchainepath +
+          "${station.longitudePosition},${station.latitudePosition};";
+    }
+    String nouvelleChaine = listchainepath.substring(
+        0, listchainepath.length - 1);
+    var baseurl = 'http://router.project-osrm.org/route/v1/driving/${nouvelleChaine}?steps=true&annotations=true&geometries=geojson&overview=full';
 
     var response = await http.get(Uri.parse(baseurl));
-    
+
     if (response.statusCode == 200) {
-      final routeData = jsonDecode(response.body)['routes'][0]['geometry']['coordinates'];
+      final routeData = jsonDecode(
+          response.body)['routes'][0]['geometry']['coordinates'];
       List<LatLng> routePoints = [];
-      
-       for(int i=0; i< routeData.length; i++){
-                          var reep = routeData[i].toString();
-                          reep = reep.replaceAll("[","");
-                          reep = reep.replaceAll("]","");
-                          var lat1 = reep.split(',');
-                          var long1 = reep.split(",");
-                          routePoints.add(LatLng( double.parse(lat1[1]), double.parse(long1[0])));
-                        }
+
+      for (int i = 0; i < routeData.length; i++) {
+        var reep = routeData[i].toString();
+        reep = reep.replaceAll("[", "");
+        reep = reep.replaceAll("]", "");
+        var lat1 = reep.split(',');
+        var long1 = reep.split(",");
+        routePoints.add(LatLng(double.parse(lat1[1]), double.parse(long1[0])));
+      }
       return routePoints;
     } else {
       throw Exception('Failed to fetch route points');
     }
+  }
+
+  static changePassword(BuildContext context, String cuid,
+      String currentPassword, String newPassword) async {
+    var loginUrl = "http://localhost:8080/User/changePassword";
+    try {
+      final response = await http.post(
+        Uri.parse(loginUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "cuid": cuid,
+          "currentPassword": currentPassword,
+          "newPassword": newPassword
+        }),
+      );
+      print(response);
+      return response;
+    }
+    catch (e) {}
   }
 }
 

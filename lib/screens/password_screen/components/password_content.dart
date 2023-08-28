@@ -1,4 +1,5 @@
 
+import 'package:bus_app_flutter/screens/login_screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
@@ -6,20 +7,22 @@ import 'dart:convert';
 import '../../../services/api_service.dart';
 import '../../../utils/constants.dart';
 import '../../map_screen.dart';
-import '../../password_screen/password_screen.dart';
 
 
 
-class LoginContent extends StatefulWidget {
-  const LoginContent({Key? key}) : super(key: key);
+class PasswordContent extends StatefulWidget {
+  const PasswordContent({Key? key}) : super(key: key);
 
   @override
-  State<LoginContent> createState() => _LoginContentState();
+  State<PasswordContent> createState() => _PasswordContentState();
 }
 
-class _LoginContentState extends State<LoginContent> {
-  TextEditingController matriculeController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+class _PasswordContentState extends State<PasswordContent> {
+  TextEditingController cuidController = TextEditingController();
+  TextEditingController currentPasswordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
   bool matriculeError = false;
   bool passwordError = false;
   bool formSubmitted = false;
@@ -29,14 +32,18 @@ class _LoginContentState extends State<LoginContent> {
 
     if (formSubmitted) {
       if (hint == 'Cuid') {
-        if (matriculeController.text.isEmpty) {
+        if (cuidController.text.isEmpty) {
           errorMsg = 'Cuid is required';
-        } else if (matriculeController.text.length <= 6) {
+        } else if (cuidController.text.length < 8) {
           errorMsg = 'Cuid must be minimum 8 characters long';
         }
-      } else if (hint == 'Password') {
-        if (passwordController.text.isEmpty) {
+      } else if (hint.contains('Password')) {
+        if (currentPasswordController.text.isEmpty) {
           errorMsg = 'Password is required';
+        }
+      }else if (hint == 'comparePassword') {
+        if (newPasswordController.text != confirmPasswordController.text) {
+          errorMsg = 'Passwords do not match';
         }
       }
     }
@@ -51,10 +58,14 @@ class _LoginContentState extends State<LoginContent> {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(30),
           child: TextField(
-            controller: hint == 'Password'
-                ? matriculeController
-                : passwordController,
-            obscureText: hint == 'Password',
+            controller: hint == 'Cuid'
+                ? cuidController
+                : hint == 'Current Password'
+                ? currentPasswordController
+                : hint == 'New Password'
+                ? newPasswordController
+                : confirmPasswordController,
+            obscureText: hint.contains('Password'),
             textAlignVertical: TextAlignVertical.bottom,
             onChanged: (text) {
               if (formSubmitted) {
@@ -70,7 +81,7 @@ class _LoginContentState extends State<LoginContent> {
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: kInputFieldFillColor, // Use the color from constants.dart
+              fillColor: kInputFieldFillColor, // Utilisez la couleur de constants.dart
               hintText: hint,
               prefixIcon: Icon(iconData),
               errorText: errorMsg.isNotEmpty ? errorMsg : null,
@@ -80,6 +91,7 @@ class _LoginContentState extends State<LoginContent> {
       ),
     );
   }
+
 
   Widget logos() {
     return Padding(
@@ -93,10 +105,7 @@ class _LoginContentState extends State<LoginContent> {
             ),
           ),
           const SizedBox(width: 16), // Add some space between the line and the image
-          Image.asset(
-            'assets/images/sofrecom.png',
-            height: 60, // Adjust the height of the image as per your requirement
-          ),
+
           const SizedBox(width: 16), // Add some space between the image and the line
           Flexible(
             child: Container(
@@ -108,15 +117,15 @@ class _LoginContentState extends State<LoginContent> {
       ),
     );
   }
-  Widget forgotPassword() {
+  Widget login() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 110),
       child: TextButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
         },
         child: const Text(
-          'Change Password?',
+          'Sign In?',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -128,13 +137,14 @@ class _LoginContentState extends State<LoginContent> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 100),
+            padding: const EdgeInsets.only(top: 20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -142,9 +152,12 @@ class _LoginContentState extends State<LoginContent> {
                 const SizedBox(height: 130),
                 logos(),
                 inputField('Cuid', Ionicons.person_outline),
-                inputField('Password', Ionicons.lock_closed_outline),
-                loginButton('Log In'),
-                forgotPassword(),
+                inputField('Current Password', Ionicons.lock_closed_outline),
+                inputField('New Password', Ionicons.lock_closed_outline),
+                inputField('Confirm Password', Ionicons.lock_closed_outline),
+                loginButton('Reset Password'),
+                login(),
+
               ],
             ),
           ),
@@ -161,9 +174,11 @@ class _LoginContentState extends State<LoginContent> {
           setState(() {
             formSubmitted = true;
             matriculeError =
-                matriculeController.text.isEmpty || matriculeController.text.length <= 6;
-            passwordError = passwordController.text.isEmpty;
+                cuidController.text.isEmpty || cuidController.text.length <= 7;
+            passwordError = currentPasswordController.text.isEmpty ;
+
           });
+
 
           if (matriculeError || passwordError) {
             // Show login error message
@@ -171,20 +186,41 @@ class _LoginContentState extends State<LoginContent> {
               content: Text('Please enter valid Cuid and Password.'),
               backgroundColor: Colors.red,
             ));
-          } else {
+          }else  if (newPasswordController.text != confirmPasswordController.text || newPasswordController.text.isEmpty  || confirmPasswordController.text.isEmpty) {
+
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Passwords do not match.'),
+              backgroundColor: Colors.red,
+            ));}
+
+          else {
             // Perform login here
-            final success = await ApiService.login(
+            final success = await ApiService.changePassword(
               context,
-              matriculeController.text,
-              passwordController.text,
+              cuidController.text,
+              currentPasswordController.text,
+                newPasswordController.text
+
+
+
             );
             if (success == false) {
               // Login failed
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Login failed. Please check your credentials.'),
+                content: Text('Change password failed. Please check your data!'),
                 backgroundColor: Colors.red,
               ));
-            }
+            }else
+              {
+
+                //redirect
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => LoginScreen(),
+                  ),
+                );
+              }
+
           }
         },
         style: ElevatedButton.styleFrom(
