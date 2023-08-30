@@ -30,9 +30,9 @@ class _LoginContentState extends State<LoginContent> {
     if (formSubmitted) {
       if (hint == 'Cuid') {
         if (matriculeController.text.isEmpty) {
-          errorMsg = 'Cuid is required';
+          errorMsg = 'Matricule is required';
         } else if (matriculeController.text.length <= 6) {
-          errorMsg = 'Cuid must be minimum 8 characters long';
+          errorMsg = 'Matricule must be minimum 6 characters long';
         }
       } else if (hint == 'Password') {
         if (passwordController.text.isEmpty) {
@@ -51,7 +51,7 @@ class _LoginContentState extends State<LoginContent> {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(30),
           child: TextField(
-            controller: hint == 'Password'
+            controller: hint == 'Cuid'
                 ? matriculeController
                 : passwordController,
             obscureText: hint == 'Password',
@@ -108,12 +108,14 @@ class _LoginContentState extends State<LoginContent> {
       ),
     );
   }
+
   Widget forgotPassword() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 110),
       child: TextButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PasswordScreen()));
         },
         child: const Text(
           'Change Password?',
@@ -126,7 +128,6 @@ class _LoginContentState extends State<LoginContent> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +169,7 @@ class _LoginContentState extends State<LoginContent> {
           if (matriculeError || passwordError) {
             // Show login error message
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Please enter valid Cuid and Password.'),
+              content: Text('Please enter valid Matricule and Password.'),
               backgroundColor: Colors.red,
             ));
           } else {

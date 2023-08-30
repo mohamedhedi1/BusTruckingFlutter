@@ -44,6 +44,8 @@ dependencies:
   ionicons: ^0.1.2
   geocoding: ^2.1.0
   flutter_local_notifications: ^5.0.0
+  fluttericon: ^2.0.0
+  awesome_icons: ^1.1.0
 
 
 

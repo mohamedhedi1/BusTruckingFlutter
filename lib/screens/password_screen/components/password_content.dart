@@ -233,7 +233,7 @@ class _PasswordContentState extends State<PasswordContent> {
         child: Text(
           buttonText,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -6,6 +6,7 @@ import '../models/Bus.dart';
 import '../models/Station.dart';
 import '../models/User.dart';
 import 'package:latlong2/latlong.dart';
+import '../screens/login_screen/login_screen.dart';
 import '../screens/map_screen.dart';
 
 class ApiService {
@@ -190,7 +191,7 @@ class ApiService {
       String currentPassword, String newPassword) async {
     var loginUrl = "http://localhost:8080/User/changePassword";
     try {
-      final response = await http.post(
+      final response = await http.put(
         Uri.parse(loginUrl),
         headers: {
           'Content-Type': 'application/json',
@@ -201,8 +202,14 @@ class ApiService {
           "newPassword": newPassword
         }),
       );
-      print(response);
-      return response;
+      if (response==true) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => LoginScreen(),
+          ),
+        );
+        return true;
+      }
     }
     catch (e) {}
   }

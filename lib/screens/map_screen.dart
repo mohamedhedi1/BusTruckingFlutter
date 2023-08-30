@@ -42,7 +42,7 @@ class _MapScreenState extends State<MapScreen> {
   final MapController mapController = MapController();
   List<LatLng> busPath = [];
     List<LatLng> movingbus = [];
-  bool initialPositionReceived = false; 
+  bool initialPositionReceived = false;
   LatLng previousBusPosition = LatLng(0, 0); // List to store bus path points
   late Bus bus;
   final Geolocator geolocator = Geolocator();
@@ -53,8 +53,8 @@ class _MapScreenState extends State<MapScreen> {
 
 
 
-  
-  
+
+
 
 
   @override
@@ -152,10 +152,10 @@ Widget build(BuildContext context) {
     title: Text(
       'BusTracking',
       style: TextStyle(
-         fontFamily: 'MontserratAlternates', 
+         fontFamily: 'MontserratAlternates',
     fontWeight: FontWeight.normal,
     fontSize: 17,
-        color: Colors.black, 
+        color: Colors.black,
       ),
     ),
     centerTitle: true,
@@ -205,10 +205,10 @@ Widget build(BuildContext context) {
                     height: 150.0,
                     point: LatLng(station.latitudePosition, station.longitudePosition),
                     builder: (ctx) =>
-         
+
             Container(child: Icon(Icons.circle, size: 20, color: Colors.green)),
           ),
-          
+
               ],
             ),
        /*      Positioned(
@@ -223,28 +223,28 @@ Widget build(BuildContext context) {
             ),
           ),*/
 
-   PolylineLayer(
-    polylineCulling: false,
-    polylines: [
-            Polyline(
-              points:busPath
-,
-              color: Color.fromARGB(173, 165, 158, 158),
-              strokeWidth: 4.0,
-            ),
-          ],
-   ),
-            PolylineLayer(
+             PolylineLayer(
               polylineCulling: false,
               polylines: [
-                Polyline(
-                  points:movingbuspath
-                  ,
-                  color: Color.fromARGB(255, 154, 4, 21),
-                  strokeWidth: 4.0,
-                ),
-              ],
-            )
+                      Polyline(
+                        points:busPath
+          ,
+                        color: Color.fromARGB(173, 165, 158, 158),
+                        strokeWidth: 4.0,
+                      ),
+                    ],
+             ),
+                  PolylineLayer(
+                    polylineCulling: false,
+                    polylines: [
+                      Polyline(
+                        points:movingbuspath
+                        ,
+                        color: Color.fromARGB(255, 154, 4, 21),
+                        strokeWidth: 4.0,
+                      ),
+                    ],
+                  )
           ],
         ),
         DraggableScrollableSheet(
@@ -294,14 +294,14 @@ Widget build(BuildContext context) {
               tooltip: 'Go to My Position',
             ),
           ),
-          
+
         Positioned(
           bottom: 80.0,
           right: 16.0,
           child: FloatingActionButton(
-            onPressed: _goToBusPosition, 
+            onPressed: _goToBusPosition,
             child: Icon(Icons.directions_bus),
-            backgroundColor: Color.fromARGB(255, 7, 38, 163), 
+            backgroundColor: Color.fromARGB(255, 7, 38, 163),
             tooltip: 'Go to Bus Position',
           ),
             ),
@@ -310,7 +310,8 @@ Widget build(BuildContext context) {
     ),
    ),
 ),
-);}
+);
+  }
 }
 
 
