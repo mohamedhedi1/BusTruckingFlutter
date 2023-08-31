@@ -81,7 +81,7 @@ class _PasswordContentState extends State<PasswordContent> {
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: kInputFieldFillColor, // Utilisez la couleur de constants.dart
+              fillColor: kInputFieldFillColor,
               hintText: hint,
               prefixIcon: Icon(iconData),
               errorText: errorMsg.isNotEmpty ? errorMsg : null,
@@ -226,7 +226,7 @@ class _PasswordContentState extends State<PasswordContent> {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: const StadiumBorder(),
-          backgroundColor: kSecondaryColor, // Use the color from constants.dart
+          backgroundColor: kSecondaryColor,
           elevation: 8,
           shadowColor: Colors.black87,
         ),

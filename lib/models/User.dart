@@ -56,7 +56,6 @@ class User {
     if (roleString == 'USER') {
       return Role.USER;
     } else {
-      // Gérez les autres rôles ici si nécessaire
       throw Exception('Unknown role: $roleString');
     }
   }
@@ -65,7 +64,6 @@ class User {
 enum Role {
   USER,
   ADMIN
-  // Ajoutez d'autres rôles ici si nécessaire
 }
 
 

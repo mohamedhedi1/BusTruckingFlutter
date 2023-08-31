@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:bus_app_flutter/models/User.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../screens/userscreen.dart';
-import '../models/User.dart';
+
 
 
 class UserInfoSheet extends StatefulWidget {
@@ -47,7 +46,7 @@ Widget build(BuildContext context) {
         ),
       ],
     ),
-    child: Row( // Use Row instead of Column
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         CircleAvatar(
@@ -59,11 +58,11 @@ Widget build(BuildContext context) {
         Text(
           nom,
           style: TextStyle(
-            fontSize: 24, // Augmentez la taille de la police pour un impact visuel plus fort
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black26, // Changez la couleur du texte
-            letterSpacing: 1.5, // Ajoutez de l'espacement entre les lettres
-            fontStyle: FontStyle.italic, // Utilisez une police italique
+            color: Colors.black26,
+            letterSpacing: 1.5,
+            fontStyle: FontStyle.italic,
           ),
         ),
       ],

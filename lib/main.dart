@@ -1,6 +1,6 @@
 import 'package:bus_app_flutter/screens/login_screen/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:bus_app_flutter/screens/map_screen.dart'; // Importez la classe MapScreen
+import 'package:bus_app_flutter/screens/map_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My Map App',
       home:  LoginScreen() ,
-      //home: MapScreen(), // Utilisez la classe MapScreen comme page d'accueil
+      //home: MapScreen(),
     );
   }
 }

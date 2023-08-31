@@ -28,7 +28,7 @@ class ApiService {
         print("Liste des stations :");
         print(stationList);
 
-        // Afficher les composants de chaque station
+
         for (var station in stationList) {
           print("ID: ${station.id}");
           print("Station: ${station.station}");
@@ -56,7 +56,6 @@ class ApiService {
       'Content-Type': 'application/json',
     });
     final data = jsonDecode(response.body);
-    print("hello bus positionnnnnnnnnnnnnnnnnnnnnnnn");
     print(data);
     double lat = data['lat'];
     double long = data['long'];

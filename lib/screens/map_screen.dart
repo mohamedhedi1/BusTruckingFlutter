@@ -71,7 +71,6 @@ class _MapScreenState extends State<MapScreen> {
         print("liste statiooooooonsssssssssssss");
         print(stationList);
 
-        // Maintenant que vous avez stationList mise à jour, appelez la fonction getRoutePoints
         ApiService.getRoutePoints(stationList).then((list) {
           setState(() {
             busPath = list as List<LatLng>;
@@ -100,7 +99,7 @@ class _MapScreenState extends State<MapScreen> {
 
     final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
-    final double distance = earthRadius * c; // Distance en kilomètres
+    final double distance = earthRadius * c;
 
     return distance;
   }
@@ -111,7 +110,6 @@ class _MapScreenState extends State<MapScreen> {
        ApiService.getBusbyUserId(widget.user.id ,access_token).then((data){
       setState(() {
         bus = data;
-       // circuitId = data.circuit.id;
 
       });
     });
@@ -124,10 +122,10 @@ class _MapScreenState extends State<MapScreen> {
 
     setState(() {
         if (!initialPositionReceived) {
-          movingbuspath.add(busPosition); // Add the initial position to the list
+          movingbuspath.add(busPosition);
           initialPositionReceived = true;
         } else {
-          movingbuspath.add(busPosition); // Add subsequent positions to the list
+          movingbuspath.add(busPosition);
         }
       });
     });
