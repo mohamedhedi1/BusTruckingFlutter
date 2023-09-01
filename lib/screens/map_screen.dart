@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-
+import 'package:flutter/material.dart' as path_import;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -13,6 +13,9 @@ import '../services/location_service.dart';
 import '../screens/userscreen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'BottomNavBar.dart';
+import 'login_screen/login_screen.dart';
 /*FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
  */
@@ -33,6 +36,13 @@ class MapScreen extends StatefulWidget {
 
 
 class _MapScreenState extends State<MapScreen> {
+  int currentIndex = 0;
+
+  setBottomBarIndex(index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
 
 
 
@@ -141,75 +151,88 @@ class _MapScreenState extends State<MapScreen> {
       mapController.move(busPosition, 25.0);
     }
   }
-@override
-Widget build(BuildContext context) {
-  return MaterialApp(
-    title: 'Moving Marker ',
-      home: Scaffold(
-          appBar: AppBar(
-    title: Text(
-      'BusTracking',
-      style: TextStyle(
-         fontFamily: 'MontserratAlternates',
-    fontWeight: FontWeight.normal,
-    fontSize: 17,
-        color: Colors.black,
-      ),
-    ),
-    centerTitle: true,
-    backgroundColor: Color.fromARGB(255, 254, 254, 254),
-    elevation: 0,
-  ),
-   body: Container(
-  decoration: BoxDecoration(
-    /*color: Color.fromARGB(223, 204, 221, 15),// Set the background color here
-    border: Border.all(color: const Color.fromARGB(255, 192, 7, 7).withOpacity(0.3)),*/
-    borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
-  ),
-    child: ClipRRect(
-    borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
-      child: Stack(
+
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    return Scaffold(
+     appBar :AppBar(
+       elevation: 1, // Ajoutez une ombre
+       backgroundColor: Colors.white, // Fond transparent
+       title: Text(
+         'BusTracking',
+         style: TextStyle(
+           fontFamily: 'MontserratAlternates',
+           fontWeight: FontWeight.normal,
+           fontSize: 17,
+           color: Colors.lightBlueAccent,
+         ),
+       ),
+       centerTitle: true,
+       actions: <Widget>[
+         IconButton(
+           icon: Icon(
+             Icons.settings,
+             color: Colors.lightBlueAccent,
+             size: 24.0,
+           ),
+           onPressed: () {
+             Navigator.of(context).pushReplacement(
+                 MaterialPageRoute(
+                   builder: (_) => LoginScreen()
+                 ));
+
+           },
+         ),
+       ],
+     )
+
+      ,
+
+      backgroundColor: Colors.transparent,
+      body: Stack(
         children: [
-        FlutterMap(
-          mapController: mapController,
-          options: MapOptions(
-            center: busPosition,
-            zoom:2.0,
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'],
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              center: busPosition,
+              zoom:2.0,
             ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  width: 150.0,
-                  height: 150.0,
-                  point: busPosition,
-                  builder: (ctx) =>
-                      Container(child: Icon(Icons.directions_bus, size: 17, color: Colors.red)),
-                ),
-                Marker(
-                  width: 130.0,
-                  height:130.0,
-                  point: myPosition,
-                  builder: (ctx) =>
-                      Container(child: Icon(Icons.person_pin_circle, size: 19, color: Colors.blue)),
-                ),
-                for (var station in stationList)
+            children: [
+              TileLayer(
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c'],
+              ),
+              MarkerLayer(
+                markers: [
                   Marker(
                     width: 150.0,
                     height: 150.0,
-                    point: LatLng(station.latitudePosition, station.longitudePosition),
+                    point: busPosition,
                     builder: (ctx) =>
+                        Container(child: Icon(Icons.directions_bus, size: 17, color: Colors.red)),
+                  ),
+                  Marker(
+                    width: 130.0,
+                    height:130.0,
+                    point: myPosition,
+                    builder: (ctx) =>
+                        Container(child: Icon(Icons.person_pin_circle, size: 19, color: Colors.blue)),
+                  ),
+                  for (var station in stationList)
+                    Marker(
+                      width: 150.0,
+                      height: 150.0,
+                      point: LatLng(station.latitudePosition, station.longitudePosition),
+                      builder: (ctx) =>
 
-            Container(child: Icon(Icons.circle, size: 20, color: Colors.green)),
-          ),
+                          Container(child: Icon(Icons.circle, size: 20, color: Colors.green)),
+                    ),
 
-              ],
-            ),
-       /*      Positioned(
+                ],
+              ),
+              /*      Positioned(
             bottom: 150.0,
             right: 16.0,
             child: FloatingActionButton(
@@ -221,98 +244,110 @@ Widget build(BuildContext context) {
             ),
           ),*/
 
-             PolylineLayer(
-              polylineCulling: false,
-              polylines: [
-                      Polyline(
-                        points:busPath
-          ,
-                        color: Color.fromARGB(173, 165, 158, 158),
-                        strokeWidth: 4.0,
-                      ),
-                    ],
-             ),
-                  PolylineLayer(
-                    polylineCulling: false,
-                    polylines: [
-                      Polyline(
-                        points:movingbuspath
-                        ,
-                        color: Color.fromARGB(255, 154, 4, 21),
-                        strokeWidth: 4.0,
-                      ),
-                    ],
-                  )
-          ],
-        ),
-        DraggableScrollableSheet(
-          initialChildSize:0.12,
-          minChildSize: 0.1,
-          maxChildSize: 0.9,
-          builder: (BuildContext context, ScrollController scrollController) {
-            return UserInfoSheet(); // Replace with your user info widget
-          },
-        ),
-        Positioned(
-           top: 32.0, // Adjust this value to move the compass icon down
-           right: 16.0,
-           child: GestureDetector(
-           onTap: () {
-           mapController.rotate(0.0); // Reset the map rotation
-    },
-    child: Container(
-      padding: EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+              PolylineLayer(
+                polylineCulling: false,
+                polylines: [
+                  Polyline(
+                    points:busPath
+                    ,
+                    color: Color.fromARGB(173, 165, 158, 158),
+                    strokeWidth: 4.0,
+                  ),
+                ],
+              ),
+              PolylineLayer(
+                polylineCulling: false,
+                polylines: [
+                  Polyline(
+                    points:movingbuspath
+                    ,
+                    color: Color.fromARGB(255, 154, 4, 21),
+                    strokeWidth: 4.0,
+                  ),
+                ],
+              )
+            ],
           ),
-        ],
-      ),
-      child: Icon(
-        Icons.explore,
-        color: Colors.black,
-        size: 24.0,
-      ),
-    ),
-  ),
-),
-        Positioned(
-            bottom: 16.0,
-            right: 16.0,
-            child: FloatingActionButton(
-              onPressed: _goToMyPosition,
-              child: Icon(Icons.my_location),
-              backgroundColor: Colors.blue,
-              tooltip: 'Go to My Position',
-            ),
-          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            child: SizedBox(
+              width: size.width,
+              height: 80,
+              child: Stack(
+                children: [
+                  CustomPaint(
+                    size: Size(size.width, 80),
+                    painter: BNBCustomPainter(),
+                  ),
+                  Center(
+                    heightFactor: 0.6,
+                    child: FloatingActionButton(backgroundColor: Colors.lightBlue, child: const Icon(Icons.home), elevation: 0.1, onPressed: () {}),
+                  ),
+                  SizedBox(
+                    width: size.width,
+                    height: 80,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
 
-        Positioned(
-          bottom: 80.0,
-          right: 16.0,
-          child: FloatingActionButton(
-            onPressed: _goToBusPosition,
-            child: Icon(Icons.directions_bus),
-            backgroundColor: Color.fromARGB(255, 7, 38, 163),
-            tooltip: 'Go to Bus Position',
-          ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.directions_bus,
+                            color: currentIndex == 1 ? Colors.blue : Colors.grey.shade400,
+                          ),
+                          onPressed: _goToBusPosition,
+                        ),
+                        Container(
+                          width: size.width * 0.20,
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.person_pin_circle,
+                            color: currentIndex == 1 ? Colors.blue : Colors.grey.shade400,
+                          ),
+                          onPressed: _goToMyPosition,),
+
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
+          )
         ],
       ),
-    ),
-   ),
-),
-);
+    );
   }
 }
 
 
+class BNBCustomPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    path_import.Path path = path_import.Path();
+    path.moveTo(0, 20); // Start
+    path.quadraticBezierTo(size.width * 0.20, 0, size.width * 0.35, 0);
+    path.quadraticBezierTo(size.width * 0.40, 0, size.width * 0.40, 20);
+    path.arcToPoint(Offset(size.width * 0.60, 20), radius: const Radius.circular(20.0), clockwise: false);
+    path.quadraticBezierTo(size.width * 0.60, 0, size.width * 0.65, 0);
+    path.quadraticBezierTo(size.width * 0.80, 0, size.width, 20);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.lineTo(0, 20);
+    canvas.drawShadow(path, Colors.black, 5, true);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
 
 /*
   void sendNotification() async {
